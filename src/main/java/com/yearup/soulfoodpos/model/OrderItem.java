@@ -1,4 +1,6 @@
 package com.yearup.soulfoodpos.model;
 
-public class OrderItem {
+public interface OrderItem {
+    double getPrice();
+    String getDescription();
 }

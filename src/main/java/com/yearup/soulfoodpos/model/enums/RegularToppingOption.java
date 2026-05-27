@@ -1,26 +1,28 @@
-package com.yearup.soulfoodpos.model;
+package com.yearup.soulfoodpos.model.enums;
 
-import com.yearup.soulfoodpos.model.enums.RegularToppingOption;
-import com.yearup.soulfoodpos.model.enums.Size;
+public enum RegularToppingOption {
+    CANDIED_YAMS("Candied Yams"),
+    CABBAGE("Cabbage"),
+    BLACK_EYED_PEAS("Black-Eyed Peas"),
+    POTATO_SALAD("Potato Salad"),
+    COLESLAW("Coleslaw"),
+    CORNBREAD("Cornbread"),
+    PICKLED_OKRA("Pickled Okra"),
+    ONIONS("Onions"),
+    PICKLES("Pickles");
 
-public class RegularTopping implements Topping {
-    private final RegularToppingOption option;
+    private final String label;
 
-    public RegularTopping(RegularToppingOption option) {
-        this.option = option;
+    RegularToppingOption(String label) {
+        this.label = label;
     }
 
-    public RegularToppingOption getOption() {
-        return option;
+    public String getLabel() {
+        return label;
     }
 
     @Override
-    public String getName() {
-        return option.getLabel();
-    }
-
-    @Override
-    public double priceFor(Size size) {
-        return 0.0;
+    public String toString() {
+        return label;
     }
 }
