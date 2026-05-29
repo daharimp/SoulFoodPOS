@@ -56,47 +56,41 @@ public class UserInterface {
         printHeader();
         System.out.println();
         printMenuSection("Meats", () -> {
-            for (MeatOption m :
-                    MeatOption.values()) {
+            for (MeatOption m : MeatOption.values()) {
                 System.out.println("    " + m + "   " +
                         Ansi.paint(Ansi.GREEN, "+$10.00 / $12.00 / $15.00"));
             }
         });
         printMenuSection("Premium Toppings", () -> {
-            for (PremiumToppingOption p :
-                    PremiumToppingOption.values()) {
+            // prices are randomized per JVM run — show live value, not hardcoded
+            for (PremiumToppingOption p : PremiumToppingOption.values()) {
                 System.out.println("    " + p + "   " +
                         Ansi.paint(Ansi.GREEN, String.format("$%.2f", p.getPrice())));
             }
         });
         printMenuSection("Premium Add-Ons (included)", () -> {
-            for (RegularToppingOption r :
-                    RegularToppingOption.values()) {
+            for (RegularToppingOption r : RegularToppingOption.values()) {
                 System.out.println("    " + r + "   " + Ansi.paint(Ansi.DIM, "(included)"));
             }
         });
         printMenuSection("Condiments (included)", () -> {
-            for (CondimentOption c :
-                    CondimentOption.values()) {
+            for (CondimentOption c : CondimentOption.values()) {
                 System.out.println("    " + c + "   " + Ansi.paint(Ansi.DIM, "(included)"));
             }
         });
         printMenuSection("Included Sides", () -> {
-            for (IncludedSideOption s :
-                    IncludedSideOption.values()) {
+            for (IncludedSideOption s : IncludedSideOption.values()) {
                 System.out.println("    " + s + "   " + Ansi.paint(Ansi.DIM, "(included)"));
             }
         });
         printMenuSection("Drinks", () -> {
-            for (DrinkFlavor d :
-                    DrinkFlavor.values()) {
+            for (DrinkFlavor d : DrinkFlavor.values()) {
                 System.out.println("    " + d + "   " +
                         Ansi.paint(Ansi.GREEN, "$2.00 / $2.50 / $3.00"));
             }
         });
         printMenuSection("Main Sides", () -> {
-            for (MainSideOption ms :
-                    MainSideOption.values()) {
+            for (MainSideOption ms : MainSideOption.values()) {
                 System.out.println("    " + ms + "   " + Ansi.paint(Ansi.GREEN, "$1.50"));
             }
         });
@@ -154,9 +148,9 @@ public class UserInterface {
             System.out.println("  (empty)\n");
             return;
         }
-        for (int i = 0; i < items.size(); i++) {
-            OrderItem oi = items.get(i);
-            System.out.println("  " + (i + 1) + ") " + colorizeHot(firstLine(oi.getDescription()))
+        int num = 1;
+        for (OrderItem oi : items) {
+            System.out.println("  " + num++ + ") " + colorizeHot(firstLine(oi.getDescription()))
                     + String.format("  $%.2f", oi.getPrice()));
         }
         System.out.println();
@@ -201,6 +195,7 @@ public class UserInterface {
                                                  ToppingFactory<E> factory, boolean offerExtra,
                                                  Function<E, String> priceLabel, int maxCount) {
         while (true) {
+            // maxCount == 0 means unlimited (regular toppings, condiments, etc.)
             long categoryCount = maxCount > 0
                     ? plate.getToppings().stream()
                     .filter(t -> java.util.Arrays.stream(options)
@@ -236,6 +231,7 @@ public class UserInterface {
                     continue;
                 }
                 E chosen = options[idx];
+                // cap any single topping at 5 regardless of category limit
                 long existing = plate.getToppings().stream()
                         .filter(t -> t.getName().equals(chosen.toString()))
                         .count();
@@ -292,10 +288,9 @@ public class UserInterface {
         printHeader();
         System.out.println("ORDER SUMMARY");
         System.out.println("---------------------------------------------");
-        List<OrderItem> items = order.getItems();
-        for (int i = 0; i < items.size(); i++) {
-            OrderItem oi = items.get(i);
-            System.out.println("Item " + (i + 1) + ":");
+        int num = 1;
+        for (OrderItem oi : order.getItems()) {
+            System.out.println("Item " + num++ + ":");
             if (oi instanceof Item plate) {
                 System.out.println(colorizeHot(plate.getDescription()));
                 System.out.printf("    Subtotal: $%.2f%n", plate.getPrice());
@@ -314,12 +309,14 @@ public class UserInterface {
                 Path path = receiptWriter.write(order);
                 System.out.println("\nReceipt saved: " + path.toAbsolutePath() + "\n");
             } catch (IOException e) {
-                System.out.println("Failed to save receipt: " + e.getMessage());
+                // order is confirmed — receipt just didn't persist
+                System.out.println("\nOrder confirmed, but receipt couldn't be saved: " + e.getMessage());
+                System.out.println("Check that data/receipts/ exists and is writable.\n");
             }
             return true;
         }
         System.out.println("Order cancelled.\n");
-        return true;
+        return false; // false = stay in the order loop; true = order is finalized
     }
 
     // ---------------- Helpers ----------------
@@ -336,7 +333,7 @@ public class UserInterface {
                 "  ╔══════════════════════════════════════════════════════╗");
         String side   = Ansi.paint(Ansi.DIM, "  ║");
         String sideEnd = Ansi.paint(Ansi.DIM, "║");
-        String name   = Ansi.paint(Ansi.BOLD + Ansi.YELLOW, "D O R O T H Y ' S   O V E N");
+        String name   = Ansi.paint(Ansi.BOLD + Ansi.YELLOW, shop.name().toUpperCase());
         String subtitle = Ansi.paint(Ansi.DIM, "──── Soul Food Kitchen ────");
         String bottom = Ansi.paint(Ansi.DIM,
                 "  ╚══════════════════════════════════════════════════════╝");

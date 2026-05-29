@@ -1,8 +1,20 @@
 # Dorothy's Oven — Soul Food POS
 
-A console-based point-of-sale system for Dorothy's Oven soul food restaurant, built as a Java capstone project. Customers walk through a guided menu to build a fully customized plate, add drinks and sides, and receive a timestamped receipt.
+A console-based point-of-sale system for Dorothy's Oven soul food restaurant, built as a Java capstone project. A branded home screen (box-drawing banner, address, phone, hours) leads to a guided menu where customers build a fully customized plate, add drinks and sides, browse the full menu, and receive a timestamped receipt. Console output is colorized with ANSI when enabled.
 
 **Tech stack:** Java 17 · Amazon Corretto 17 · Maven
+
+---
+
+## Location & Hours
+
+**Dorothy's Oven** — _"Real soul food, real love."_
+
+- 1247 Fillmore Street, San Francisco, CA 94115
+- (415) 555-0184
+- Tue–Sun · 11am–9pm (Closed Mon)
+
+> Address and phone are illustrative placeholders for the capstone, defined in `ShopInfo` inside `Program.main()`.
 
 ---
 
@@ -29,6 +41,10 @@ Receipts are saved automatically to `data/receipts/yyyyMMdd-HHmmss.txt`.
 | Main Sides | 4 shareable family-style sides ($1.50 flat) |
 | Order validation | A plate-less order requires at least one drink or main side |
 | Receipt output | Auto-saved to `data/receipts/` with timestamp filename |
+| Branded home screen | Box-drawing banner with shop name, address, phone, hours, and tagline |
+| View Menu | Browse all seven categories with prices without starting an order |
+| About / Hours | Shop story plus address, phone, and hours |
+| Color output | ANSI color when enabled — bold shop name, green prices, red "Make it Hot"; plain when `Ansi.enabled = false` |
 
 ---
 
@@ -73,7 +89,7 @@ Receipts are saved automatically to `data/receipts/yyyyMMdd-HHmmss.txt`.
 
 ```
 src/main/java/com/yearup/soulfoodpos/
-├── Program.java                        Entry point — wires UserInterface
+├── Program.java                        Entry point — builds ShopInfo, wires UserInterface
 ├── model/
 │   ├── Topping.java                    Interface: getName(), priceFor(Size), isExtra()
 │   ├── Item.java                       Abstract base for plated items
@@ -87,6 +103,7 @@ src/main/java/com/yearup/soulfoodpos/
 │   ├── MainSide.java                   OrderItem — flat $1.50
 │   ├── Order.java                      Cart: holds OrderItems, computes total
 │   ├── OrderItem.java                  Interface: getDescription(), getPrice()
+│   ├── ShopInfo.java                   Record: name, tagline, address, phone, hours
 │   └── enums/
 │       ├── PlateType.java              Enum with label + meatSlots capacity
 │       ├── Size.java                   SMALL / MEDIUM / LARGE
@@ -98,9 +115,10 @@ src/main/java/com/yearup/soulfoodpos/
 │       ├── DrinkFlavor.java            7 flavors
 │       └── MainSideOption.java         4 family sides
 ├── ui/
-│   └── UserInterface.java              All console screens and ordering flow
+│   ├── Ansi.java                       ANSI color constants + paint() helper (Ansi.enabled toggle)
+│   └── UserInterface.java              Home / View Menu / About screens + ordering flow
 └── io/
-    └── ReceiptWriter.java              Writes timestamped receipts to data/receipts/
+    └── ReceiptWriter.java              Writes receipts (banner + contact + items) to data/receipts/
 ```
 
 ---
@@ -159,13 +177,20 @@ public enum PlateType {
 
 Each plate type self-describes how many meats it supports — the enum is the single source of truth.
 
+### ShopInfo Record + Ansi Helper — Presentation Layer
+
+`ShopInfo` is an immutable Java 17 record holding shop identity (name, tagline, address, phone, hours). It is constructed once in `Program.main()` and threaded into both `UserInterface` and `ReceiptWriter` — one source of truth for branding across the screen and the printed receipt.
+
+`Ansi` centralizes color: a `paint(code, text)` helper wraps text in ANSI escape codes, gated by a global `Ansi.enabled` flag. The console UI is colorized (bold yellow shop name, green prices, red "Make it Hot"), while receipts deliberately use the plain `getDescription()` path so saved `.txt` files contain no escape codes.
+
+A two-tier header keeps the brand visible without crowding the order flow: the full box-drawing banner appears on the home screen, the About screen, and receipts, while in-flow screens (order, add-item, checkout, View Menu) use a thin one-line header.
+
 ---
 
 ## Architecture Diagram
 
-Current architecture (reflects Family Bundle plate, premium-topping random pricing, generic `addToppings<E>` flow, and receipt coupon footer):
+Current architecture (reflects the Phase 8 visual refresh — `ShopInfo` record, `Ansi` color helper, home / View Menu / About screens, banner + contact receipt — plus the Family Bundle plate, premium-topping random pricing, and generic `addToppings<E>` flow):
+
+![Architecture diagram](architecture.svg)
 
 - **Editable source:** [`architecture.excalidraw`](architecture.excalidraw) — open in [excalidraw.com](https://excalidraw.com) via *File → Open* to view or edit.
-
-Earlier snapshot (pre-Family-Bundle):
-[View on Excalidraw](https://excalidraw.com/#json=C1Wb8dlIHw1raCstm0UF6,efDN_L3AXIVuKm7vspsxJA) · ![Architecture diagram](architecture-diagram.png)

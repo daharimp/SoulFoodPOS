@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 public class ReceiptWriter {
 
@@ -33,7 +32,9 @@ public class ReceiptWriter {
 
     public Path write(Order order) throws IOException {
         Files.createDirectories(receiptsDir);
-        String fileName = order.getTimestamp().format(FILE_FMT) + ".txt";
+        // append nanos to avoid collision when two orders land in the same second
+        String fileName = order.getTimestamp().format(FILE_FMT)
+                + "-" + System.nanoTime() + ".txt";
         Path target = receiptsDir.resolve(fileName);
         Files.writeString(target, render(order));
         return target;
@@ -57,10 +58,9 @@ public class ReceiptWriter {
         sb.append("  Order: ").append(order.getTimestamp().format(DISPLAY_FMT)).append("\n");
         sb.append("  ────────────────────────────────────────────────────────\n\n");
 
-        List<OrderItem> items = order.getItems();
-        for (int i = 0; i < items.size(); i++) {
-            OrderItem oi = items.get(i);
-            sb.append("Item ").append(i + 1).append(":\n");
+        int num = 1;
+        for (OrderItem oi : order.getItems()) {
+            sb.append("Item ").append(num++).append(":\n");
             if (oi instanceof Item plate) {
                 sb.append(plate.getDescription()).append("\n");
                 sb.append(String.format("    Subtotal: $%.2f\n", plate.getPrice()));
