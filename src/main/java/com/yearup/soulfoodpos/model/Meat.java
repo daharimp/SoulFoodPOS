@@ -26,13 +26,13 @@ public class Meat implements Topping {
         return extra;
     }
 
-    // Custom pricing: $10.00 (Sm) / $12.00 (Md) / $15.00 (Lg) — extras add $0.50 / $1.00 / $1.50
+    // Capstone price sheet: $1.00 (Sm) / $2.00 (Md) / $3.00 (Lg) — an extra portion adds $0.50 / $1.00 / $1.50
     @Override
     public double priceFor(Size size) {
         double base = switch (size) {
-            case SMALL -> 10.00;
-            case MEDIUM -> 12.00;
-            case LARGE -> 15.00;
+            case SMALL -> 1.00;
+            case MEDIUM -> 2.00;
+            case LARGE -> 3.00;
         };
         double extraAdd = extra ? switch (size) {
             case SMALL -> 0.50;
@@ -42,4 +42,3 @@ public class Meat implements Topping {
         return base + extraAdd;
     }
 }
-

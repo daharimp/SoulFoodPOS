@@ -1,18 +1,25 @@
 package com.yearup.soulfoodpos.model.enums;
 
 public enum Size {
-    SMALL("Small (2 lb)"),
-    MEDIUM("Medium (4 lb)"),
-    LARGE("Large (8 lb)");
+    SMALL("Small", 1),
+    MEDIUM("Medium", 2),
+    LARGE("Large", 3);
 
     private final String label;
+    // bigger bowl holds more proteins — this drives the meat auto-advance in addToppings
+    private final int meatSlots;
 
-    Size(String label) {
+    Size(String label, int meatSlots) {
         this.label = label;
+        this.meatSlots = meatSlots;
     }
 
     public String getLabel() {
         return label;
+    }
+
+    public int getMeatSlots() {
+        return meatSlots;
     }
 
     @Override
@@ -20,4 +27,3 @@ public enum Size {
         return label;
     }
 }
-

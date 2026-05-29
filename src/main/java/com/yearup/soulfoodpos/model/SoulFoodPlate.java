@@ -10,22 +10,11 @@ public class SoulFoodPlate extends Item {
     }
 
     private double basePlatePrice() {
-        return switch (type) {
-            case SAMPLER_PLATE -> switch (size) {
-                case SMALL  -> 8.00;
-                case MEDIUM -> 15.00;
-                case LARGE  -> 18.00;
-            };
-            case FAMILY_BUNDLE -> switch (size) {
-                case SMALL  -> 6.00;
-                case MEDIUM -> 12.00;
-                case LARGE  -> 14.00;
-            };
-            default -> switch (size) {
-                case SMALL  -> 3.50;
-                case MEDIUM -> 9.00;
-                case LARGE  -> 8.50;
-            };
+        // Capstone price sheet: every rice base is the same price, set by size
+        return switch (size) {
+            case SMALL  -> 3.50;
+            case MEDIUM -> 9.00;
+            case LARGE  -> 8.50;
         };
     }
 
