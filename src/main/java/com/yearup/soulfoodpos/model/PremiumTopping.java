@@ -26,11 +26,20 @@ public class PremiumTopping implements Topping {
         return extra;
     }
 
-    // Session-random price ($6.50–$9.50) assigned per enum constant; extra adds 40%
+    // Capstone price sheet: $0.75 (Sm) / $1.50 (Md) / $2.25 (Lg);
+    // an extra portion adds the "extra cheese" surcharge $0.30 / $0.60 / $0.90
     @Override
     public double priceFor(Size size) {
-        double base = option.getPrice();
-        double extraAdd = extra ? Math.round(base * 0.40 * 100.0) / 100.0 : 0.0;
+        double base = switch (size) {
+            case SMALL -> 0.75;
+            case MEDIUM -> 1.50;
+            case LARGE -> 2.25;
+        };
+        double extraAdd = extra ? switch (size) {
+            case SMALL -> 0.30;
+            case MEDIUM -> 0.60;
+            case LARGE -> 0.90;
+        } : 0.0;
         return base + extraAdd;
     }
 }
