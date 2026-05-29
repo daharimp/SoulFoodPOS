@@ -130,13 +130,13 @@ The entire topping selection flow (meats, premiums, regulars, condiments, includ
 
 ```java
 private <E extends Enum<E>> void addToppings(
-    SoulFoodPlate plate,
-    String label,
-    E[] options,
-    ToppingFactory<E> factory,
-    boolean offerExtra,
-    Function<E, String> priceLabel,
-    int maxCount          // enforces plate-type meat slot limit; 0 = unlimited
+        SoulFoodPlate plate,
+        String label,
+        E[] options,
+        ToppingFactory<E> factory,
+        boolean offerExtra,
+        Function<E, String> priceLabel,
+        int maxCount          // enforces plate-type meat slot limit; 0 = unlimited
 )
 ```
 
@@ -163,7 +163,9 @@ Each plate type self-describes how many meats it supports — the enum is the si
 
 ## Architecture Diagram
 
-Interactive diagram (opens in Excalidraw):
-[View on Excalidraw](https://excalidraw.com/#json=C1Wb8dlIHw1raCstm0UF6,efDN_L3AXIVuKm7vspsxJA)
+Current architecture (reflects Family Bundle plate, premium-topping random pricing, generic `addToppings<E>` flow, and receipt coupon footer):
 
-![Architecture diagram](architecture-diagram.png)
+- **Editable source:** [`architecture.excalidraw`](architecture.excalidraw) — open in [excalidraw.com](https://excalidraw.com) via *File → Open* to view or edit.
+
+Earlier snapshot (pre-Family-Bundle):
+[View on Excalidraw](https://excalidraw.com/#json=C1Wb8dlIHw1raCstm0UF6,efDN_L3AXIVuKm7vspsxJA) · ![Architecture diagram](architecture-diagram.png)

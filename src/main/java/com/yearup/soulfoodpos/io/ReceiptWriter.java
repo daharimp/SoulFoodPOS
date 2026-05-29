@@ -3,6 +3,7 @@ package com.yearup.soulfoodpos.io;
 import com.yearup.soulfoodpos.model.Item;
 import com.yearup.soulfoodpos.model.Order;
 import com.yearup.soulfoodpos.model.OrderItem;
+import com.yearup.soulfoodpos.model.ShopInfo;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,14 +20,14 @@ public class ReceiptWriter {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final Path receiptsDir;
-    private final String shopName;
+    private final ShopInfo shop;
 
-    public ReceiptWriter(String shopName) {
-        this(shopName, Paths.get("data", "receipts"));
+    public ReceiptWriter(ShopInfo shop) {
+        this(shop, Paths.get("data", "receipts"));
     }
 
-    public ReceiptWriter(String shopName, Path receiptsDir) {
-        this.shopName = shopName;
+    public ReceiptWriter(ShopInfo shop, Path receiptsDir) {
+        this.shop = shop;
         this.receiptsDir = receiptsDir;
     }
 
@@ -40,10 +41,21 @@ public class ReceiptWriter {
 
     private String render(Order order) {
         StringBuilder sb = new StringBuilder();
-        sb.append("=============================================\n");
-        sb.append("        ").append(shopName).append("\n");
-        sb.append("        ").append(order.getTimestamp().format(DISPLAY_FMT)).append("\n");
-        sb.append("=============================================\n\n");
+
+        sb.append("  ╔══════════════════════════════════════════════════════╗\n");
+        sb.append("  ║                                                    ║\n");
+        sb.append("  ║          D O R O T H Y ' S   O V E N               ║\n");
+        sb.append("  ║          ──── Soul Food Kitchen ────              ║\n");
+        sb.append("  ║                                                    ║\n");
+        sb.append("  ╚══════════════════════════════════════════════════════╝\n");
+        sb.append("                  ").append(shop.addressLine1()).append("\n");
+        sb.append("               ").append(shop.cityStateZip()).append("\n");
+        sb.append("                    ").append(shop.phone()).append("\n");
+        sb.append("            ").append(shop.hours()).append("\n");
+        sb.append("               \"").append(shop.tagline()).append("\"\n");
+        sb.append("\n");
+        sb.append("  Order: ").append(order.getTimestamp().format(DISPLAY_FMT)).append("\n");
+        sb.append("  ────────────────────────────────────────────────────────\n\n");
 
         List<OrderItem> items = order.getItems();
         for (int i = 0; i < items.size(); i++) {
@@ -58,15 +70,15 @@ public class ReceiptWriter {
             sb.append("\n");
         }
 
-        sb.append("---------------------------------------------\n");
-        sb.append(String.format("TOTAL: $%.2f\n", order.getTotal()));
-        sb.append("=============================================\n");
+        sb.append("  ────────────────────────────────────────────────────────\n");
+        sb.append(String.format("  TOTAL: $%.2f\n", order.getTotal()));
+        sb.append("  ════════════════════════════════════════════════════════\n");
         sb.append("\n");
-        sb.append("   Thank you for shopping at Dorothy's Oven!\n");
+        sb.append("   Thank you for shopping at ").append(shop.name()).append("!\n");
         sb.append("\n");
-        sb.append("  * Bring this receipt back and receive a  *\n");
-        sb.append("  *         FREE large drink!              *\n");
-        sb.append("=============================================\n");
+        sb.append("  * Bring this receipt back and receive a *\n");
+        sb.append("  *         FREE large drink!             *\n");
+        sb.append("  ════════════════════════════════════════════════════════\n");
         return sb.toString();
     }
 }

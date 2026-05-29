@@ -1,6 +1,7 @@
 package com.yearup.soulfoodpos.ui;
 
 import com.yearup.soulfoodpos.io.ReceiptWriter;
+import com.yearup.soulfoodpos.model.ShopInfo;
 import com.yearup.soulfoodpos.model.*;
 import com.yearup.soulfoodpos.model.enums.*;
 
@@ -15,29 +16,108 @@ import java.util.function.Function;
 public class UserInterface {
 
     private final Scanner scanner = new Scanner(System.in);
-    private final String shopName;
+    private final ShopInfo shop;
     private final ReceiptWriter receiptWriter;
     private Order order;
 
-    public UserInterface(String shopName) {
-        this.shopName = shopName;
-        this.receiptWriter = new ReceiptWriter(shopName);
+    public UserInterface(ShopInfo shop) {
+        this.shop = shop;
+        this.receiptWriter = new ReceiptWriter(shop);
     }
 
     // ---------------- Main loop ----------------
 
     public void display() {
         while (true) {
-            printHeader();
-            System.out.println("1) New Order");
-            System.out.println("0) Exit");
-            String cmd = prompt("> ");
+            String cmd = homeScreen();
             switch (cmd) {
                 case "1" -> orderScreen();
+                case "2" -> viewMenuScreen();
+                case "3" -> aboutScreen();
                 case "0" -> { System.out.println("Goodbye!"); return; }
-                default -> System.out.println("Invalid option. Try again.\n");
+                default -> System.out.println(Ansi.paint(Ansi.RED, "Invalid option. Try again.\n"));
             }
         }
+    }
+
+    private String homeScreen() {
+        printBigBanner();
+        printContactBlock();
+        printTagline();
+        System.out.println();
+        System.out.println("  " + Ansi.paint(Ansi.BOLD, "1)") + " New Order");
+        System.out.println("  " + Ansi.paint(Ansi.BOLD, "2)") + " View Menu");
+        System.out.println("  " + Ansi.paint(Ansi.BOLD, "3)") + " About / Hours");
+        System.out.println("  " + Ansi.paint(Ansi.BOLD, "0)") + " Exit");
+        return prompt("  > ");
+    }
+
+    private void viewMenuScreen() {
+        printHeader();
+        System.out.println();
+        printMenuSection("Meats", () -> {
+            for (MeatOption m :
+                    MeatOption.values()) {
+                System.out.println("    " + m + "   " +
+                        Ansi.paint(Ansi.GREEN, "+$10.00 / $12.00 / $15.00"));
+            }
+        });
+        printMenuSection("Premium Toppings", () -> {
+            for (PremiumToppingOption p :
+                    PremiumToppingOption.values()) {
+                System.out.println("    " + p + "   " +
+                        Ansi.paint(Ansi.GREEN, String.format("$%.2f", p.getPrice())));
+            }
+        });
+        printMenuSection("Premium Add-Ons (included)", () -> {
+            for (RegularToppingOption r :
+                    RegularToppingOption.values()) {
+                System.out.println("    " + r + "   " + Ansi.paint(Ansi.DIM, "(included)"));
+            }
+        });
+        printMenuSection("Condiments (included)", () -> {
+            for (CondimentOption c :
+                    CondimentOption.values()) {
+                System.out.println("    " + c + "   " + Ansi.paint(Ansi.DIM, "(included)"));
+            }
+        });
+        printMenuSection("Included Sides", () -> {
+            for (IncludedSideOption s :
+                    IncludedSideOption.values()) {
+                System.out.println("    " + s + "   " + Ansi.paint(Ansi.DIM, "(included)"));
+            }
+        });
+        printMenuSection("Drinks", () -> {
+            for (DrinkFlavor d :
+                    DrinkFlavor.values()) {
+                System.out.println("    " + d + "   " +
+                        Ansi.paint(Ansi.GREEN, "$2.00 / $2.50 / $3.00"));
+            }
+        });
+        printMenuSection("Main Sides", () -> {
+            for (MainSideOption ms :
+                    MainSideOption.values()) {
+                System.out.println("    " + ms + "   " + Ansi.paint(Ansi.GREEN, "$1.50"));
+            }
+        });
+        waitForEnter();
+    }
+
+    private void printMenuSection(String title, Runnable body) {
+        System.out.println("  " + Ansi.paint(Ansi.BOLD, "── " + title + " ──"));
+        body.run();
+        System.out.println();
+    }
+
+    private void aboutScreen() {
+        printBigBanner();
+        System.out.println();
+        printContactBlock();
+        System.out.println();
+        System.out.println("  Dorothy's Oven has been serving San Francisco's");
+        System.out.println("  Fillmore district for two generations. Recipes from");
+        System.out.println("  Big Mama's kitchen, plated for you today.");
+        waitForEnter();
     }
 
     // ---------------- Order screen ----------------
@@ -76,7 +156,7 @@ public class UserInterface {
         }
         for (int i = 0; i < items.size(); i++) {
             OrderItem oi = items.get(i);
-            System.out.println("  " + (i + 1) + ") " + firstLine(oi.getDescription())
+            System.out.println("  " + (i + 1) + ") " + colorizeHot(firstLine(oi.getDescription()))
                     + String.format("  $%.2f", oi.getPrice()));
         }
         System.out.println();
@@ -217,7 +297,7 @@ public class UserInterface {
             OrderItem oi = items.get(i);
             System.out.println("Item " + (i + 1) + ":");
             if (oi instanceof Item plate) {
-                System.out.println(plate.getDescription());
+                System.out.println(colorizeHot(plate.getDescription()));
                 System.out.printf("    Subtotal: $%.2f%n", plate.getPrice());
             } else {
                 System.out.println("    " + oi.getDescription());
@@ -246,9 +326,45 @@ public class UserInterface {
 
     private void printHeader() {
         System.out.println();
-        System.out.println("=============================================");
-        System.out.println("     " + shopName + " — Point of Sale");
-        System.out.println("=============================================");
+        System.out.println("  " + Ansi.paint(Ansi.DIM,
+                "── " + shop.name() + "  ·  Point of Sale ──"));
+        System.out.println();
+    }
+
+    private void printBigBanner() {
+        String border = Ansi.paint(Ansi.DIM,
+                "  ╔══════════════════════════════════════════════════════╗");
+        String side   = Ansi.paint(Ansi.DIM, "  ║");
+        String sideEnd = Ansi.paint(Ansi.DIM, "║");
+        String name   = Ansi.paint(Ansi.BOLD + Ansi.YELLOW, "D O R O T H Y ' S   O V E N");
+        String subtitle = Ansi.paint(Ansi.DIM, "──── Soul Food Kitchen ────");
+        String bottom = Ansi.paint(Ansi.DIM,
+                "  ╚══════════════════════════════════════════════════════╝");
+
+        System.out.println();
+        System.out.println(border);
+        System.out.println(side + "                                                    " + sideEnd);
+        System.out.println(side + "          " + name + "               " + sideEnd);
+        System.out.println(side + "          " + subtitle + "              " + sideEnd);
+        System.out.println(side + "                                                    " + sideEnd);
+        System.out.println(bottom);
+    }
+
+    private void printContactBlock() {
+        System.out.println("                  " + shop.addressLine1());
+        System.out.println("               " + shop.cityStateZip());
+        System.out.println("                    " + shop.phone());
+        System.out.println("            " + shop.hours());
+    }
+
+    private void printTagline() {
+        System.out.println(Ansi.paint(Ansi.DIM, "               \"" + shop.tagline() + "\""));
+    }
+
+    private void waitForEnter() {
+        System.out.println();
+        System.out.print(Ansi.paint(Ansi.DIM, "  Press Enter to return..."));
+        scanner.nextLine();
     }
 
     private Size chooseSize() {
@@ -280,5 +396,10 @@ public class UserInterface {
     private String prompt(String msg) {
         System.out.print(msg);
         return scanner.nextLine();
+    }
+
+    private String colorizeHot(String description) {
+        return description.replace("[Make it Hot]",
+                Ansi.paint(Ansi.RED, "[Make it Hot]"));
     }
 }
