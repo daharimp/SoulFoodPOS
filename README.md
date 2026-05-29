@@ -1,6 +1,6 @@
 # Dorothy's Oven — Soul Food POS
 
-A console-based point-of-sale system for Dorothy's Oven soul food restaurant, built as a Java capstone project. A branded home screen (box-drawing banner, address, phone, hours) leads to a guided menu where customers build a fully customized plate, add drinks and sides, browse the full menu, and receive a timestamped receipt. Console output is colorized with ANSI when enabled.
+A console-based point-of-sale system for Dorothy's Oven soul food restaurant, built as a Java showcase project. A branded home screen (banner, address, phone, hours) leads to a guided menu where customers build a full soul food spread in their cli, add drinks and sides, browse the full menu, and receive a timestamped receipt. Console output is colorized with ANSI when enabled.
 
 **Tech stack:** Java 17 · Amazon Corretto 17 · Maven
 
@@ -188,8 +188,6 @@ A two-tier header keeps the brand visible without crowding the order flow: the f
 ---
 
 ## Architecture Diagram
-
-Current architecture (reflects the Phase 8 visual refresh — `ShopInfo` record, `Ansi` color helper, home / View Menu / About screens, banner + contact receipt — plus the Family Bundle plate, premium-topping random pricing, and generic `addToppings<E>` flow):
 
 ![Architecture diagram](architecture.svg)
 
