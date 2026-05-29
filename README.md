@@ -200,7 +200,5 @@ A two-tier header keeps the brand visible without crowding the order flow: the f
 
 ## Architecture Diagram
 
-Current architecture — `ShopInfo` record, `Ansi` color helper, home / View Menu / About screens, banner + contact receipt, the four rice-base bowl types, size-driven meat slots, and the generic `addToppings<E>` flow:
-
 ![Architecture diagram](architecture.svg)
 
