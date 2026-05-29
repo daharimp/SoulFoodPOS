@@ -1,6 +1,11 @@
-# Dorothy's Oven — Soul Food POS
+# Dorothy's Soul Bowls — Soul Food POS
 
-A console-based point-of-sale system for Dorothy's Oven soul food restaurant, built as a Java showcase project. A branded home screen (banner, address, phone, hours) leads to a guided menu where customers build a full soul food spread in their cli, add drinks and sides, browse the full menu, and receive a timestamped receipt. Console output is colorized with ANSI when enabled.
+A console-based point-of-sale system for **Dorothy's Soul Bowls**, a soul food
+rice-bowl shop, built as a Java capstone project. A branded home screen (box-drawing
+banner, address, phone, hours) leads to a guided menu where customers build a fully
+customized bowl — pick a rice base, size, meats, toppings, condiments, and sides —
+add drinks and a main side, browse the full menu, and receive a timestamped receipt.
+Console output is colorized with ANSI when enabled.
 
 **Tech stack:** Java 17 · Amazon Corretto 17 · Maven
 
@@ -8,7 +13,7 @@ A console-based point-of-sale system for Dorothy's Oven soul food restaurant, bu
 
 ## Location & Hours
 
-**Dorothy's Oven** — _"Real soul food, real love."_
+**Dorothy's Soul Bowls** — _"Real soul food, real love."_
 
 - 1247 Fillmore Street, San Francisco, CA 94115
 - (415) 555-0184
@@ -34,12 +39,13 @@ Receipts are saved automatically to `data/receipts/yyyyMMdd-HHmmss.txt`.
 
 | Feature | Details |
 |---|---|
-| Plate builder | Choose plate type, size, meats, premium toppings, regular toppings, condiments, and included sides |
-| Plate types | Single Meat, Two-Meat Combo, Three-Meat Family, Family Bundle (5 meats), Sampler Plate (6 meats) |
-| Make it Hot | Optional spice upgrade on any plate |
+| Bowl builder | Choose rice base, size, meats, premium toppings, regular toppings, condiments, and included sides |
+| Rice bases | White Rice · Jambalaya · Brown Rice · Garlic Rice (the bowl "type") |
+| Sizes | Small / Medium / Large — each size also sets how many meats the bowl holds (1 / 2 / 3) |
+| Make it Hot | Optional spice upgrade on any bowl |
 | Drinks | 3 sizes × 7 flavors |
 | Main Sides | 4 shareable family-style sides ($1.50 flat) |
-| Order validation | A plate-less order requires at least one drink or main side |
+| Order validation | A bowl-less order requires at least one drink or main side |
 | Receipt output | Auto-saved to `data/receipts/` with timestamp filename |
 | Branded home screen | Box-drawing banner with shop name, address, phone, hours, and tagline |
 | View Menu | Browse all seven categories with prices without starting an order |
@@ -50,24 +56,28 @@ Receipts are saved automatically to `data/receipts/yyyyMMdd-HHmmss.txt`.
 
 ## Pricing
 
+Prices follow the Capstone 2 "Custom Food Shop" example price sheet.
+
 | Component | Small | Medium | Large |
 |---|---|---|---|
-| Plate base (standard) | $3.50 | $9.00 | $8.50 |
-| Plate base (Family Bundle) | $6.00 | $12.00 | $14.00 |
-| Plate base (Sampler) | $8.00 | $15.00 | $18.00 |
-| Meat | $10.00 | $12.00 | $15.00 |
-| Extra Meat upgrade | +$0.50 | +$1.00 | +$1.50 |
-| Premium Topping | $6.50–$9.50 | same | same |
-| Extra Premium upgrade | +40% of base | same | same |
-| Regular Toppings / Condiments / Included Sides | included | same | same |
+| Bowl base (all 4 rice bases) | $3.50 | $9.00 | $8.50 |
+| Meat | $1.00 | $2.00 | $3.00 |
+| Extra meat upgrade | +$0.50 | +$1.00 | +$1.50 |
+| Premium topping | $0.75 | $1.50 | $2.25 |
+| Extra premium upgrade | +$0.30 | +$0.60 | +$0.90 |
+| Regular Toppings / Condiments / Included Sides | included | included | included |
 | Drink | $2.00 | $2.50 | $3.00 |
 | Main Side | $1.50 flat | — | — |
 
-> The Large plate base ($8.50) being less than Medium ($9.00) matches the spec literally. Adjust the constants in `SoulFoodPlate.basePlatePrice()` if your instructor approves a correction.
+> The Large bowl base ($8.50) being less than Medium ($9.00) matches the spec price
+> sheet literally. Adjust the constants in `SoulFoodPlate.basePlatePrice()` if your
+> instructor approves a correction.
 
 ---
 
 ## Full Menu
+
+**Rice bases (bowl types)** — White Rice · Jambalaya · Brown Rice · Garlic Rice
 
 **Meats** — Fried Chicken · Ox-Tails · Fried Catfish · Smoked Turkey Leg · Pork Chops · Hot Links
 
@@ -92,10 +102,10 @@ src/main/java/com/yearup/soulfoodpos/
 ├── Program.java                        Entry point — builds ShopInfo, wires UserInterface
 ├── model/
 │   ├── Topping.java                    Interface: getName(), priceFor(Size), isExtra()
-│   ├── Item.java                       Abstract base for plated items
-│   ├── SoulFoodPlate.java              Plate — delegates price to each Topping
-│   ├── Meat.java                       Topping impl with size-scaled pricing
-│   ├── PremiumTopping.java             Topping impl with enum-driven base + 40% extra
+│   ├── Item.java                       Abstract base for the bowl
+│   ├── SoulFoodPlate.java              The bowl (Item subclass) — delegates price to each Topping
+│   ├── Meat.java                       Topping impl — size-scaled price ($1/$2/$3) + extra surcharge
+│   ├── PremiumTopping.java             Topping impl — size-based price ($0.75/$1.50/$2.25) + extra surcharge
 │   ├── RegularTopping.java             Topping impl — always $0.00
 │   ├── Condiment.java                  Topping impl — always $0.00
 │   ├── IncludedSide.java               Topping impl — always $0.00
@@ -105,10 +115,10 @@ src/main/java/com/yearup/soulfoodpos/
 │   ├── OrderItem.java                  Interface: getDescription(), getPrice()
 │   ├── ShopInfo.java                   Record: name, tagline, address, phone, hours
 │   └── enums/
-│       ├── PlateType.java              Enum with label + meatSlots capacity
-│       ├── Size.java                   SMALL / MEDIUM / LARGE
+│       ├── PlateType.java              Enum of rice bases (White/Jambalaya/Brown/Garlic) — label only
+│       ├── Size.java                   SMALL / MEDIUM / LARGE + meat-slot capacity (1 / 2 / 3)
 │       ├── MeatOption.java             6 meat variants
-│       ├── PremiumToppingOption.java   4 premium options with individual prices
+│       ├── PremiumToppingOption.java   4 premium options (label only)
 │       ├── RegularToppingOption.java   9 options
 │       ├── CondimentOption.java        6 condiments
 │       ├── IncludedSideOption.java     3 included sides
@@ -120,6 +130,9 @@ src/main/java/com/yearup/soulfoodpos/
 └── io/
     └── ReceiptWriter.java              Writes receipts (banner + contact + items) to data/receipts/
 ```
+
+> The core dish class is named `SoulFoodPlate` — "plate" is used as the general term
+> for a prepared dish; at Dorothy's Soul Bowls that dish is a rice bowl.
 
 ---
 
@@ -148,34 +161,32 @@ The entire topping selection flow (meats, premiums, regulars, condiments, includ
 
 ```java
 private <E extends Enum<E>> void addToppings(
-        SoulFoodPlate plate,
-        String label,
-        E[] options,
-        ToppingFactory<E> factory,
-        boolean offerExtra,
-        Function<E, String> priceLabel,
-        int maxCount          // enforces plate-type meat slot limit; 0 = unlimited
-)
+    SoulFoodPlate plate,
+    String label,
+    E[] options,
+    ToppingFactory<E> factory,
+    boolean offerExtra,
+    Function<E, String> priceLabel,
+    int maxCount          // meat-slot limit for the size; 0 = unlimited
+);
 ```
 
-`PlateType` carries its own `meatSlots` value (1–6), which is passed directly as `maxCount` for meat selection — the UI automatically advances when the limit is reached.
+`Size` carries its own `meatSlots` value (1 / 2 / 3), which is passed directly as `maxCount` for meat selection — the UI automatically advances when the limit is reached.
 
-### PlateType Enum with Capacity
+### Size Enum with Capacity
 
 ```java
-public enum PlateType {
-    SINGLE_MEAT_PLATE("Single Meat Plate", 1),
-    TWO_MEAT_COMBO    ("Two-Meat Combo",    2),
-    THREE_MEAT_FAMILY ("Three-Meat Family", 3),
-    FAMILY_BUNDLE     ("Family Bundle",     5),
-    SAMPLER_PLATE     ("Sampler Plate",     6);
+public enum Size {
+    SMALL ("Small",  1),
+    MEDIUM("Medium", 2),
+    LARGE ("Large",  3);
 
     private final String label;
-    private final int meatSlots;
+    private final int meatSlots;   // bigger bowl holds more proteins
 }
 ```
 
-Each plate type self-describes how many meats it supports — the enum is the single source of truth.
+Each size self-describes how many meats a bowl of that size holds — the enum is the single source of truth, and the meat-selection UI auto-advances once the slots are full. The rice base (`PlateType`) is a separate, label-only choice that does not affect capacity.
 
 ### ShopInfo Record + Ansi Helper — Presentation Layer
 
@@ -191,4 +202,3 @@ A two-tier header keeps the brand visible without crowding the order flow: the f
 
 ![Architecture diagram](architecture.svg)
 
-- **Editable source:** [`architecture.excalidraw`](architecture.excalidraw) — open in [excalidraw.com](https://excalidraw.com) via *File → Open* to view or edit.

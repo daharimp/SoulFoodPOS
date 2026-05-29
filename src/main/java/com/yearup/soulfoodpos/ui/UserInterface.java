@@ -114,9 +114,9 @@ public class UserInterface {
         System.out.println();
         printContactBlock();
         System.out.println();
-        System.out.println("  Dorothy's Oven has been serving San Francisco's");
+        System.out.println(" " + shop.name() + " has been serving San Francisco's");
         System.out.println("  Fillmore district for two generations. Recipes from");
-        System.out.println("  Big Mama's kitchen, plated for you today.");
+        System.out.println("  A Slice of Southern Hospitality, served for you today.");
         waitForEnter();
     }
 
