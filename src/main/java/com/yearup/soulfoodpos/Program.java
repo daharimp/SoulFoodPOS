@@ -7,7 +7,7 @@ public class Program {
 
     public static void main(String[] args) {
         ShopInfo shop = new ShopInfo(
-                "Dorothy's Oven",
+                "Dorothy's Soul Bowls",
                 "Real soul food, real love.",
                 "1247 Fillmore Street",
                 "San Francisco, CA 94115",
